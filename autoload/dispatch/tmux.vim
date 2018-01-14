@@ -54,7 +54,7 @@ function! dispatch#tmux#make(request) abort
   elseif has('gui_running') || empty($TMUX) || (!empty(''.session) && session !=# system('tmux display-message -p "#S"')[0:-2])
     let cmd = 'new-window -n '.title
   else
-    let cmd = 'split-window -l '.(height < 0 ? -height : height).' -d'
+    let cmd = 'split-window -h -p 50 -d'
   endif
 
   let cmd .= ' ' . dispatch#shellescape('-P', '-t', session.':', 'exec ' . script)
@@ -117,7 +117,7 @@ function! dispatch#tmux#activate(pid) abort
   if !empty(session)
     let session = ' -t '.shellescape(session)
   endif
-  let panes = split(system('tmux list-panes -s -F "#{pane_id}"'.session), "\n")
+  let panes = vplit(system('tmux list-panes -s -F "#{pane_id}"'.session), "\n")
   if index(panes, pane) >= 0
     call system('tmux select-window -t '.pane.'; tmux select-pane -t '.pane)
     return !v:shell_error

@@ -1214,7 +1214,7 @@ function! s:cwindow(request, all, copen) abort
     return
   endif
   let was_qf = s:is_quickfix()
-  execute 'botright' (a:copen ? 'copen' : 'cwindow') height
+  execute 'vert belowright' (a:copen ? 'copen' : 'cwindow') height
   if !was_qf && s:is_quickfix() && a:copen !=# -2
     wincmd p
   endif
