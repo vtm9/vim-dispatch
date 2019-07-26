@@ -19,7 +19,12 @@ function! dispatch#job#handle(request) abort
     return 0
   endif
   if exists('*job_start')
-    let job = job_start(split(&shell) + split(&shellcmdflag) + [a:request.expanded], {
+    if has('win32')
+      let cmd = &shell . ' ' . &shellcmdflag . ' ' . dispatch#windows#escape(a:request.expanded)
+    else
+      let cmd = split(&shell) + split(&shellcmdflag) + [a:request.expanded]
+    endif
+    let job = job_start(cmd, {
           \ 'mode': 'raw',
           \ 'callback': function('s:output'),
           \ 'close_cb': function('s:closed'),
@@ -87,7 +92,7 @@ function! s:output(ch, output, ...) abort
   let waiting.output[-1] .= remove(output, 0)
   call extend(waiting.output, output)
 
-  if dispatch#request(getqflist({'all': 1}).title) is# request && len(waiting.output) > 1
+  if dispatch#request(get(getqflist({'title': 1}), 'title', '')) is# request && len(waiting.output) > 1
     let lefm = &l:efm
     let gefm = &g:efm
     let makeprg = &l:makeprg
